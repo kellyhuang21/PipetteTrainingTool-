@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Pipetting: BioE 140L Tutorials</title>
+
+  <!-- Custom fonts for this template-->
+  <link href="{{ url_for('static',filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
+
+  <!-- Custom styles for this template-->
+  <link href="{{ url_for('static',filename='css/sb-admin.css') }}" rel="stylesheet">
+
+</head>
+
+<body id="page-top" onload="hideresults()">
+
+<nav class="navbar navbar-expand navbar-dark bg-dark static-top">
+
+  <a class="navbar-brand mr-1" href="/">BioE 140L Lab Tutorials</a>
+
+  <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
+    <i class="fas fa-bars"></i>
+  </button>
+
+
+</nav>
+
+<div id="wrapper">
+
+  <!-- Sidebar -->
+  <ul class="sidebar navbar-nav">
+    <li class="nav-item">
+      <a class="nav-link" href="/">
+        <i class="fas fa-fw fa-tachometer-alt"></i>
+        <span>Home</span>
+      </a>
+    </li>
+    <li class="nav-item active">
+      <a class="nav-link" href="/upload">
+        <i class="fas fa-fw fa-chart-area"></i>
+        <span>Pipetting</span></a>
+    </li>
+  </ul>
+
+  <div id="content-wrapper">
+
+    <div class="container-fluid">
+
+      <!-- Breadcrumbs-->
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/">Home</a>
+        </li>
+        <li class="breadcrumb-item active">Pipetting</li>
+
+      </ol>
+
+      {% if not results %}
+      <div class="card mb-3">
+        <div class="card-header">
+          <i class="fas fa-chart-area"></i>
+          Pipetting Instructions</div>
+        <div class="card-body" style="text-align:center">
+          <iframe src="https://drive.google.com/file/d/1_dqRVed8pIGpqTsbiOdaIPG7xR04qloC/preview" width="100%" height="400"></iframe>
+        </div>
+        <div class="card-footer small text-muted">PDF of instructions: <a href="https://drive.google.com/file/d/1_dqRVed8pIGpqTsbiOdaIPG7xR04qloC/preview">Here</a></div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header">
+          <i class="fas fa-chart-area"></i>
+          Upload Tecan Data from Experiment</div>
+        <div class="card-body" style="text-align:center">
+          <h1>Upload the Tecan Data (xlsx only)</h1>
+          <form method=post enctype=multipart/form-data>
+            <input type=file name=data>
+            <hr>
+            <input type=submit value=Upload class="btn btn-lg btn-block btn-primary">
+          </form>
+        </div>
+        <div class="card-footer small text-muted">Data must be kept in original format.</div>
+      </div>
+      {% endif %}
+
+
+      <!-- DataTables Example -->
+      {% if results %}
+      {% set count = [0] %}
+      {% for key, val in results.items() %}
+      <div class="card mb-3">
+        <div class="card-header" style="cursor:pointer" onclick="toggleDisplay({{ count[0] }})">
+          <i class="fas fa-address-card"></i>
+          Student {{ key }} Results | Click to Expand or Hide</div>
+        <div class="analysis card-body" style="text-align:center" id="{{ count[0] }}">
+          <div class="row">
+            {% for exp in val %}
+          <div class="col-md-6  ">
+              <img src="{{ exp[2] }}" class="mini" alt="" />
+              <p>{{ exp[0] }} Result: {{ exp[1] }}</p>
+              <p style="font-size:10px">Additional Information: {{ exp[3] }}</p>
+          </div>
+            <div class="col-md-6  ">
+              <img src="{{ additional[count[0]][1] }}" class="mini" alt="" />
+              <p>Linear Regression Analysis (deviation from norm): </p>
+              <p style="font-size:10px">Additional Information: {{ count[0] }}
+                <br>
+                {% for val in additional[count[0]][0] %}
+                  {% set vindex = [0] %}
+                  {% for v in val %}
+                    {{ v }}
+                    {{ vindex[0] }}
+                  {% if vindex.append(vindex.pop() + 1) %}{% endif %} {# increment vindex by 1 #}
+                  {% endfor %}
+                {% endfor %}
+              </p>
+            </div>
+            {% endfor %}
+          </div>
+
+        </div>
+      </div>
+      {% if count.append(count.pop() + 1) %}{% endif %} {# increment count by 1 #}
+      {% endfor %}
+      <div class="card mb-3">
+        <div class="card-header">
+          <i class="fas fa-table"></i>
+          Metadata</div>
+        <div class="card-body" id="exempt" style="text-align:center">
+          {% for key, val in metadata.items() %}
+          <li>{{ key }} {{ val }}</li>
+        {% endfor %}
+        </div>
+        <div class="card-footer small text-muted">Updated {{ date }}</div>
+      </div>
+      {% endif %}
+
+
+
+    </div>
+    <!-- /.container-fluid -->
+
+    <!-- Sticky Footer -->
+    <footer class="sticky-footer">
+      <div class="container my-auto">
+        <div class="copyright text-center my-auto">
+          <span>Copyright © Nathan and Kelly</span>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+  <!-- /.content-wrapper -->
+
+</div>
+<!-- /#wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+  <i class="fas fa-angle-up"></i>
+</a>
+
+<!-- Logout Modal-->
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-primary" href="login.html">Logout</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap core JavaScript-->
+<script src="{{ url_for('static',filename='vendor/jquery/jquery.min.js') }}"></script>
+<script src="{{ url_for('static',filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="{{ url_for('static',filename='js/sb-admin.min.js') }}"></script>
+
+<script>
+  function hideresults() {
+    var cards = document.getElementsByClassName("analysis");
+    var exempt = document.getElementById("exempt");
+    console.log(cards);
+    console.log(exempt);
+    for (var i = 1, max = cards.length; i < max; i++){
+      if (cards[i] !== exempt) {
+        cards[i].style.display = "none";
+      }
+    }
+  }
+  function toggleDisplay(x) {
+    console.log(x);
+    var card = document.getElementById(x);
+    console.log(card);
+    if (card.style.display === "none") {
+      card.style.display = "block";
+    }
+    else {
+      card.style.display = "none";
+    }
+  }
+</script>
+
+</body>
+
+</html>
